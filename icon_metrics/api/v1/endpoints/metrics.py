@@ -12,5 +12,5 @@ router = APIRouter()
 async def get_supply(session: AsyncSession = Depends(get_session)) -> Supply:
     """Get latest supply."""
     result = await session.execute(select(Supply))
-    preps = result.scalars().one()
+    preps = result.first()
     return preps

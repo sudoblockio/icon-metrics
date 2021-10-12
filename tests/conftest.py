@@ -7,6 +7,13 @@ from _pytest.logging import caplog as _caplog
 from fastapi.testclient import TestClient
 from loguru import logger
 
+from icon_metrics.db import session
+
+
+@pytest.fixture(scope="session")
+def db():
+    yield session
+
 
 @pytest.fixture(scope="module")
 def client() -> Generator:
