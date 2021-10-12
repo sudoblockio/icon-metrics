@@ -20,5 +20,5 @@ def test_calculate_organization_supply(organization_addresses):
 
     assert organization_supply < 240000000
 
-    # This is ~65M off (907M - 672M = 235 - 170 = 65)
-    assert round(organization_supply) == 170535822
+    # This is ~65M off (907M - 672M = 235 - 171 = 64)
+    assert round(organization_supply, -6) == 171000000
