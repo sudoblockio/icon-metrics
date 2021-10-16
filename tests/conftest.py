@@ -1,5 +1,7 @@
 import logging
 import os
+from threading import Thread
+from time import sleep
 from typing import Generator
 
 import pytest
@@ -39,3 +41,20 @@ def caplog(_caplog):
     handler_id = logger.add(PropogateHandler(), format="{message} {extra}")
     yield _caplog
     logger.remove(handler_id)
+
+
+@pytest.fixture()
+def run_process_wait():
+    def f(target, timeout: int = 5):
+        thread = Thread(
+            target=target,
+            args=(),
+        )
+        thread.daemon = True
+        thread.start()
+
+        # Let worker work
+        sleep(timeout)
+        assert thread.is_alive()
+
+    return f

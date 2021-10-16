@@ -9,6 +9,7 @@ from starlette.middleware.cors import CORSMiddleware
 from icon_metrics.api.health import is_database_online
 from icon_metrics.api.v1.router import api_router
 from icon_metrics.config import settings
+from icon_metrics.http_client import http_client
 from icon_metrics.log import logger
 
 app = FastAPI()
@@ -37,6 +38,12 @@ app.add_middleware(
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
+
+
+@app.on_event("startup")
+async def startup():
+    http_client.start()
+
 
 logger.info("Starting metrics server.")
 metrics_pool = ThreadPool(1)

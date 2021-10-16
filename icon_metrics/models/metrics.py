@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
+from pydantic import BaseModel
 from sqlmodel import Field, SQLModel
 
 
@@ -16,3 +17,8 @@ class Supply(SQLModel, table=True):
     total_supply: Optional[float] = Field(0, index=False)
     organization_supply: Optional[float] = Field(0, index=False)
     circulating_supply: Optional[float] = Field(0, index=False)
+
+
+class NodeState(BaseModel):
+    prep_name: str
+    state_id: int

@@ -35,7 +35,10 @@ class Settings(BaseSettings):
     BACKUP_ICON_NODE_URL = "http://34.218.244.40:9000/api/v3"
 
     # Targets
-    MAIN_PROMETHEUS_ENDPOINT: str = None
+    CLUSTER_PROMETHEUS_ENDPOINT: str = "http://localhost:9090"  # For metrics to update node status
+    ICON_PROMETHEUS_ENDPOINT: str = (
+        "http://localhost:9090"  # Multiple prom DBs with different metrics
+    )
 
     # DB
     POSTGRES_USER: str = "postgres"
