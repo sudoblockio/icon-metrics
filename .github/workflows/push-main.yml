@@ -80,14 +80,13 @@ jobs:
         with:
           repository: geometry-labs/icon-charts
           ref: main
-          path: chart
           token: ${{ secrets.ICON_CHARTS_PAT }}
 
       - name: Update dev-mainnet deployment values file (API) and re-commit
         uses: fjogeleit/yaml-update-action@master
         with:
-          workDir: chart
-          repository: icon-charts
+          workDir: icon-charts
+          repository: geometry-labs/icon-charts
           valueFile: 'deployments/dev/mainnet/metrics/values.yaml'
           propertyPath: 'api.image.tag'
           value: ${{ github.run_number }}
@@ -101,8 +100,8 @@ jobs:
       - name: Update dev-mainnet deployment values file (WORKER) and re-commit
         uses: fjogeleit/yaml-update-action@master
         with:
-          workDir: chart
-          repository: icon-charts
+          workDir: icon-charts
+          repository: geometry-labs/icon-charts
           valueFile: 'deployments/dev/mainnet/metrics/values.yaml'
           propertyPath: 'worker.image.tag'
           value: ${{ github.run_number }}
