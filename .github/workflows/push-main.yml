@@ -87,6 +87,7 @@ jobs:
         uses: fjogeleit/yaml-update-action@master
         with:
           workDir: chart
+          repository: icon-charts
           valueFile: 'deployments/dev/mainnet/metrics/values.yaml'
           propertyPath: 'api.image.tag'
           value: ${{ github.run_number }}
@@ -101,6 +102,7 @@ jobs:
         uses: fjogeleit/yaml-update-action@master
         with:
           workDir: chart
+          repository: icon-charts
           valueFile: 'deployments/dev/mainnet/metrics/values.yaml'
           propertyPath: 'worker.image.tag'
           value: ${{ github.run_number }}
