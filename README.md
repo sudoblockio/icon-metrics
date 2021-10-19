@@ -21,7 +21,7 @@ docker-compose -f docker-compose.db.yml -f docker-compose.yml up -d
 make up
 ```
 
-2. With the whole stack from the main [icon-explorer]() repo.
+2. With the whole stack from the main [icon-explorer](https://github.com/geometry-labs/icon-explorer) repo.
 
 Run `make help` for more options.
 
