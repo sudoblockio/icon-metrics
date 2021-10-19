@@ -85,8 +85,8 @@ jobs:
 
       - name: Update dev-mainnet deployment values file (API) and re-commit
         uses: fjogeleit/yaml-update-action@master
-        working-directory: ./chart
         with:
+          workDir: chart
           valueFile: 'deployments/dev/mainnet/metrics/values.yaml'
           propertyPath: 'api.image.tag'
           value: ${{ github.run_number }}
@@ -99,8 +99,8 @@ jobs:
 
       - name: Update dev-mainnet deployment values file (WORKER) and re-commit
         uses: fjogeleit/yaml-update-action@master
-        working-directory: ./chart
         with:
+          workDir: chart
           valueFile: 'deployments/dev/mainnet/metrics/values.yaml'
           propertyPath: 'worker.image.tag'
           value: ${{ github.run_number }}
