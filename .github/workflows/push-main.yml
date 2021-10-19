@@ -18,24 +18,48 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Install deps
-        run: |
-          pip3 install -r requirements_api.txt -r requirements_worker.txt -r requirements_dev.txt
-          pip3 install --upgrade protobuf
+      - name: Create last_synced_block.txt
+        run: mkdir ./volumes && mkdir ./volumes/etl && echo "34000000" >> ./volumes/etl/last_synced_block.txt
 
-      - name: Bring up stack
-        run: make up-dbs && sleep 30
+      - name: Bring up DBs
+        run: docker-compose -f docker-compose.db.yml up -d && sleep 30
 
-      - name: Check stack
+      - name: Check DBs
         run: make ps
 
-      - name: Run tests with coverage
-        run: make test-coverage
+      - name: Run unit tests
+        run: cd src && go test -v -covermode=atomic -coverprofile=coverage.out ./...
 
       - uses: codecov/codecov-action@v2
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./coverage.xml
+          files: ./src/coverage.out
+          flags: unit
+          fail_ci_if_error: true
+
+      - name: Bring up stack
+        run: make up && sleep 30
+
+      - name: Check stack
+        run: make ps
+
+      - name: Check ETL logs
+        run: docker-compose -f docker-compose.yml -f docker-compose.db.yml logs --tail=100 etl
+
+      - name: Check worker logs
+        run: docker-compose -f docker-compose.yml -f docker-compose.db.yml logs --tail=100 blocks-worker
+
+      - name: Check api logs
+        run: docker-compose -f docker-compose.yml -f docker-compose.db.yml logs --tail=100 blocks-api
+
+      - name: Run integration tests
+        run: cd tests && go test -v -covermode=atomic -coverprofile=coverage.out ./...
+
+      - uses: codecov/codecov-action@v2
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./tests/coverage.out
+          flags: integration
           fail_ci_if_error: true
 
       - name: Configure AWS credentials
@@ -52,7 +76,7 @@ jobs:
       - name: Worker - Build, tag, and push image to Amazon ECR
         env:
           ECR_REGISTRY: ${{ steps.login-ecr-worker.outputs.registry }}
-          ECR_REPOSITORY: icon-metrics-worker
+          ECR_REPOSITORY: icon-blocks-worker
           IMAGE_TAG: ${{ github.run_number }}
         run: |
           docker build --target prod --build-arg SERVICE_NAME=worker -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
@@ -72,7 +96,7 @@ jobs:
       - name: API - Build, tag, and push image to Amazon ECR
         env:
           ECR_REGISTRY: ${{ steps.login-ecr-api.outputs.registry }}
-          ECR_REPOSITORY: icon-metrics-api
+          ECR_REPOSITORY: icon-blocks-api
           IMAGE_TAG: ${{ github.run_number }}
         run: |
           docker build --target prod  --build-arg SERVICE_NAME=api -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
@@ -86,60 +110,35 @@ jobs:
           target_branch: deployment-dev
           github_token: ${{ github.token }}
 
-      - name: Checkout dev deployment
+      - name: Checkout charts repo
         uses: actions/checkout@v2
         with:
-          ref: deployment-dev
-          path: deployment-dev
+          repository: geometry-labs/icon-charts
+          ref: main
+          path: chart
 
       - name: Update dev-mainnet deployment values file (API) and re-commit
         uses: fjogeleit/yaml-update-action@master
         with:
-          valueFile: 'chart/deployments/dev-mainnet/values.dev.yaml'
+          valueFile: 'chart/deployments/dev/mainnet/metrics/values.yaml'
           propertyPath: 'api.image.tag'
           value: ${{ github.run_number }}
-          branch: deployment-dev
+          branch: main
           createPR: 'false'
-          token: ${{ secrets.GITHUB_TOKEN }}
+#          token: ${{ secrets.GITHUB_TOKEN }}
           updateFile: true
           commitChange: false
-          workDir: deployment-dev
+#          workDir: deployment-dev
 
       - name: Update dev-mainnet deployment values file (WORKER) and re-commit
         uses: fjogeleit/yaml-update-action@master
         with:
-          valueFile: 'chart/deployments/dev-mainnet/values.dev.yaml'
+          valueFile: 'chart/deployments/dev/mainnet/metrics/values.yaml'
           propertyPath: 'worker.image.tag'
           value: ${{ github.run_number }}
-          branch: deployment-dev
+          branch: main
           createPR: 'false'
           message: 'Update dev deployment (mainnet) image versions to ${{ github.run_number }}'
           token: ${{ secrets.GITHUB_TOKEN }}
           updateFile: true
-          workDir: deployment-dev
-
-#      - name: Update dev-mainnet deployment values file (API) and re-commit
-#        uses: fjogeleit/yaml-update-action@master
-#        with:
-#          valueFile: 'chart/deployments/dev-sejong/values.dev.yaml'
-#          propertyPath: 'api.image.tag'
-#          value: ${{ github.run_number }}
-#          branch: deployment-dev
-#          createPR: 'false'
-#          token: ${{ secrets.GITHUB_TOKEN }}
-#          updateFile: true
-#          commitChange: false
-#          workDir: deployment-dev
-#
-#      - name: Update dev-mainnet deployment values file (WORKER) and re-commit
-#        uses: fjogeleit/yaml-update-action@master
-#        with:
-#          valueFile: 'chart/deployments/dev-sejong/values.dev.yaml'
-#          propertyPath: 'worker.image.tag'
-#          value: ${{ github.run_number }}
-#          branch: deployment-dev
-#          createPR: 'false'
-#          message: 'Update dev deployment (sejong) image versions to ${{ github.run_number }}'
-#          token: ${{ secrets.GITHUB_TOKEN }}
-#          updateFile: true
 #          workDir: deployment-dev
