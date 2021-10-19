@@ -81,6 +81,7 @@ jobs:
           repository: geometry-labs/icon-charts
           ref: main
           path: chart
+          token: ${{ secrets.ICON_CHARTS_PAT }}
 
       - name: Update dev-mainnet deployment values file (API) and re-commit
         uses: fjogeleit/yaml-update-action@master
@@ -104,6 +105,6 @@ jobs:
           branch: main
           createPR: 'false'
           message: 'Update dev deployment (mainnet) image versions to ${{ github.run_number }}'
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.ICON_CHARTS_PAT }}
           updateFile: true
 #          workDir: deployment-dev
