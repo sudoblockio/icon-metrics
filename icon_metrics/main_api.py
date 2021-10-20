@@ -51,6 +51,8 @@ metrics_pool.apply_async(start_http_server, (settings.METRICS_PORT, settings.MET
 
 logger.info("Starting application...")
 app.include_router(api_router, prefix=settings.REST_PREFIX)
+app.add_api_route(settings.HEALTH_PREFIX, health([is_database_online]))
+
 
 if __name__ == "__main__":
     uvicorn.run(
