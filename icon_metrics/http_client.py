@@ -5,7 +5,7 @@ class HttpClient:
     session: aiohttp.ClientSession = None
 
     def start(self):
-        self.session = aiohttp.ClientSession()
+        self.session = aiohttp.ClientSession(trust_env=True)
 
     async def stop(self):
         await self.session.close()
