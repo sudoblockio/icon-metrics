@@ -3,11 +3,13 @@ import os
 
 from sqlalchemy.orm import sessionmaker
 
-from icon_metrics.db import engine
+from icon_metrics.log import logger
 from icon_metrics.models.addresses import Address
+from icon_metrics.workers.db import engine
 
 
 def init_db():
+    logger.info(f"Initializing database...")
     SessionMade = sessionmaker(bind=engine)
     session = SessionMade()
 

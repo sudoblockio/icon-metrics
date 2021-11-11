@@ -5,8 +5,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
 
+from icon_metrics.api.db import get_session
 from icon_metrics.config import settings
-from icon_metrics.db import get_session
 from icon_metrics.http_client import http_client
 from icon_metrics.models.metrics import NodeState, Supply
 

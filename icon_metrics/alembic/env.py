@@ -6,9 +6,10 @@ from sqlalchemy import engine_from_config, pool
 from sqlalchemy.ext.asyncio import AsyncEngine
 from sqlmodel import SQLModel
 
-from icon_metrics.db import ASYNC_SQLALCHEMY_DATABASE_URL, SQLALCHEMY_DATABASE_URL
+from icon_metrics.api.db import ASYNC_SQLALCHEMY_DATABASE_URL
 from icon_metrics.models.addresses import Address
 from icon_metrics.models.metrics import Supply, Transactions
+from icon_metrics.workers.db import SQLALCHEMY_DATABASE_URL
 
 # Other versions imported each object
 config = context.config

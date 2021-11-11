@@ -8,12 +8,16 @@ import pytest
 from _pytest.logging import caplog as _caplog
 from fastapi.testclient import TestClient
 from loguru import logger
+from sqlalchemy.orm import sessionmaker
 
-from icon_metrics.db import session
+from icon_metrics.workers.db import engine
 
 
 @pytest.fixture(scope="session")
 def db():
+    SessionMade = sessionmaker(bind=engine)
+    session = SessionMade()
+
     yield session
 
 
@@ -45,10 +49,10 @@ def caplog(_caplog):
 
 @pytest.fixture()
 def run_process_wait():
-    def f(target, timeout: int = 5):
+    def f(target, args=(), timeout: int = 5):
         thread = Thread(
             target=target,
-            args=(),
+            args=args,
         )
         thread.daemon = True
         thread.start()

@@ -23,3 +23,10 @@ def test_calculate_organization_supply(organization_addresses):
     # This is ~65M off (907M - 672M = 235 - 171 = 64)
     # assert round(organization_supply, -6) == 171000000
     # Just failed but the point is above
+
+
+# def test_supply_cron_worker(db, run_process_wait):
+#     from icon_metrics.workers.supply_cron import supply_cron_worker
+#     with db as session:
+#         # run_process_wait(supply_cron_worker(session), 5)
+#         supply_cron_worker(session)
