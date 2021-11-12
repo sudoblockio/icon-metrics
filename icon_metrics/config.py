@@ -60,7 +60,7 @@ class Settings(BaseSettings):
 
     _governance_address: str = "cx0000000000000000000000000000000000000000"
 
-    CRON_SLEEP_SEC: int = 10
+    CRON_SLEEP_SEC: int = 3600
 
     class Config:
         case_sensitive = True

@@ -2,7 +2,10 @@ import csv
 
 import pytest
 
-from icon_metrics.workers.supply_cron import calculate_organization_supply
+from icon_metrics.workers.supply_cron import (
+    calculate_organization_supply,
+    supply_cron_worker,
+)
 
 
 @pytest.fixture()
@@ -25,8 +28,6 @@ def test_calculate_organization_supply(organization_addresses):
     # Just failed but the point is above
 
 
-# def test_supply_cron_worker(db, run_process_wait):
-#     from icon_metrics.workers.supply_cron import supply_cron_worker
-#     with db as session:
-#         # run_process_wait(supply_cron_worker(session), 5)
-#         supply_cron_worker(session)
+def test_supply_cron_worker(db, run_process_wait):
+    with db as session:
+        run_process_wait(supply_cron_worker, (session,), 5)

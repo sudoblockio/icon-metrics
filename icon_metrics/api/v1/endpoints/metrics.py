@@ -16,7 +16,7 @@ router = APIRouter()
 @router.get("/metrics/supply")
 async def get_supply(session: AsyncSession = Depends(get_session)) -> Supply:
     """Get latest supply."""
-    result = await session.execute(select(Supply))
+    result = await session.execute(select(Supply).order_by(Supply.timestamp.desc()).limit(1))
     supply = result.first()
     return supply[0]
 
