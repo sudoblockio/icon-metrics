@@ -1,3 +1,4 @@
+from datetime import datetime
 from time import sleep
 
 from sqlalchemy.orm import sessionmaker
@@ -34,6 +35,7 @@ def supply_cron_worker(session):
 
         supply = Supply()
         supply.total_supply = int(getTotalSupply(), 16)
+        supply.timestamp = datetime.now().timestamp()
 
         if i % 100 == 0:
             # Wait 100 iterations to refresh

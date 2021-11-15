@@ -13,7 +13,7 @@ class Transactions(SQLModel, table=True):
 
 class Supply(SQLModel, table=True):
     id: Optional[int] = Field(None, primary_key=True)
-    timestamp: Optional[int] = Field(datetime.now().timestamp(), index=True)
+    timestamp: Optional[int] = Field(None, index=True)
     total_supply: Optional[float] = Field(0, index=False)
     organization_supply: Optional[float] = Field(0, index=False)
     circulating_supply: Optional[float] = Field(0, index=False)
