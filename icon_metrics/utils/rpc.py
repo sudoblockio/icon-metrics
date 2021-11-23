@@ -17,7 +17,7 @@ def post_rpc(payload: dict):
             return
         return r.json()["result"]
 
-    x = int(r.json()["result"], 16)
+    # x = int(r.json()["result"], 16)
 
     return r.json()["result"]
 
@@ -42,7 +42,8 @@ def getPReps():
             "dataType": "call",
             "data": {
                 "method": "getPReps",
-                "params": {"startRanking": "0x1", "endRanking": "0xaaa"},  # Should be all preps
+                "params": {"startRanking": "0x1", "endRanking": "0xaaa"},
+                # Should be all preps
             },
         },
     }
@@ -55,6 +56,23 @@ def getBalance(address: str):
         "method": "icx_getBalance",
         "id": 1234,
         "params": {"address": address},
+    }
+    return post_rpc(payload)
+
+
+def getStake(address: str):
+    payload = {
+        "jsonrpc": "2.0",
+        "id": 1234,
+        "method": "icx_call",
+        "params": {
+            "to": "cx0000000000000000000000000000000000000000",
+            "dataType": "call",
+            "data": {
+                "method": "getStake",
+                "params": {"address": address},
+            },
+        },
     }
     return post_rpc(payload)
 
