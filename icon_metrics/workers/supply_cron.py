@@ -26,17 +26,13 @@ def calculate_organization_supply(addresses):
 
 
 def get_supply(session, iteration: int):
-    addresses = []
-
     supply = Supply()
     supply.total_supply = int(getTotalSupply(), 16)
     supply.timestamp = datetime.now().timestamp()
 
-    if iteration % 100 == 0:
-        # Wait 100 iterations to refresh
-        query = select(Address).where(Address.organization_wallet)
-        result = session.execute(query)
-        addresses = result.scalars().all()
+    query = select(Address).where(Address.organization_wallet)
+    result = session.execute(query)
+    addresses = result.scalars().all()
 
     supply.organization_supply = calculate_organization_supply([i.address for i in addresses])
 
