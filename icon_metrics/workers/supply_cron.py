@@ -1,5 +1,4 @@
 from datetime import datetime
-from time import sleep
 
 from sqlmodel import select
 
@@ -19,13 +18,16 @@ def calculate_organization_supply(addresses):
     for address in addresses:
         address_balance = int(getBalance(address), 16)
 
-        address_balance += int(getStake(address)["stake"], 16)
+        stakes = getStake(address)
+        address_balance += int(stakes["stake"], 16)
+        for i in stakes["unstakes"]:
+            address_balance += int(stakes["unstakes"][i]["unstake"], 16)
         organization_supply += address_balance
 
     return organization_supply
 
 
-def get_supply(session, iteration: int):
+def get_supply(session):
     supply = Supply()
     supply.total_supply = int(getTotalSupply(), 16)
     supply.timestamp = datetime.now().timestamp()
@@ -42,19 +44,8 @@ def get_supply(session, iteration: int):
     session.commit()
 
 
-def supply_cron_worker(session):
-    """Cron job to scrape a list of known address balances and sum them to get the total supply."""
-
-    iteration = 0
-    while True:
-        logger.info(f"Iteration {iteration}")
-        get_supply(session, iteration)
-        sleep(settings.CRON_SLEEP_SEC)
-        iteration += 1
-
-
 if __name__ == "__main__":
     from icon_metrics.workers.db import session_factory
 
     with session_factory() as session:
-        supply_cron_worker(session)
+        get_supply(session)
