@@ -1,10 +1,11 @@
-from prometheus_client import Gauge
+from prometheus_client import Counter, Gauge
 
 
 class Metrics:
-    def __init__(self):
-        self.circulating_supply = Gauge("circulating_supply", "Total supply - org supply.")
+    circulating_supply = Gauge("circulating_supply", "Total supply - org supply.")
+    organization_supply = Gauge("organization_supply", "All org wallet balances.")
+    total_supply = Gauge("total_supply", "Total supply.")
+    supply_cron_ran = Counter("preps_base_cron_ran", "")
 
-        self.organization_supply = Gauge("organization_supply", "All org wallet balances.")
 
-        self.total_supply = Gauge("total_supply", "Total supply.")
+prom_metrics = Metrics()

@@ -84,3 +84,13 @@ def getTotalSupply():
         "id": 1234,
     }
     return post_rpc(payload)
+
+
+def debug_getTrace(txHash: str):
+    payload = {
+        "jsonrpc": "2.0",
+        "id": 100,
+        "method": "debug_getTrace",
+        "params": {"txHash": txHash},
+    }
+    return post_rpc(payload)

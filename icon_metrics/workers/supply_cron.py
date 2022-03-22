@@ -1,27 +1,33 @@
+import csv
+import os
 from datetime import datetime
 
-from sqlmodel import select
-
-from icon_metrics.config import settings
-from icon_metrics.log import logger
-from icon_metrics.metrics import Metrics
-from icon_metrics.models.addresses import Address
 from icon_metrics.models.metrics import Supply
 from icon_metrics.utils.rpc import getBalance, getStake, getTotalSupply
 
-metrics = Metrics()
+BURN_ADDRESS = "hx1000000000000000000000000000000000000000"
 
 
-def calculate_organization_supply(addresses):
+def get_organization_addresses() -> list:
+    addresses = []
+    path = os.path.join(os.path.dirname(__file__), "organization-addresses.csv")
+    with open(path) as f:
+        reader = csv.reader(f, delimiter=",")
+        for row in reader:
+            addresses.append(row[0])
+    return addresses
+
+
+def calculate_organization_supply():
     organization_supply = 0
-
+    addresses = get_organization_addresses()
     for address in addresses:
         address_balance = int(getBalance(address), 16)
 
         stakes = getStake(address)
         address_balance += int(stakes["stake"], 16)
         for i in stakes["unstakes"]:
-            address_balance += int(stakes["unstakes"][i]["unstake"], 16)
+            address_balance += int(i["unstake"], 16)
         organization_supply += address_balance
 
     return organization_supply
@@ -29,23 +35,10 @@ def calculate_organization_supply(addresses):
 
 def get_supply(session):
     supply = Supply()
-    supply.total_supply = int(getTotalSupply(), 16)
     supply.timestamp = datetime.now().timestamp()
-
-    query = select(Address).where(Address.organization_wallet)
-    result = session.execute(query)
-    addresses = result.scalars().all()
-
-    supply.organization_supply = calculate_organization_supply([i.address for i in addresses])
-
-    supply.circulating_supply = supply.total_supply - supply.organization_supply
+    supply.total_supply = int(getTotalSupply(), 16)
+    supply.organization_supply = calculate_organization_supply()
+    supply.circulating_supply = supply.total_supply - int(getBalance(BURN_ADDRESS), 16)
 
     session.merge(supply)
     session.commit()
-
-
-if __name__ == "__main__":
-    from icon_metrics.workers.db import session_factory
-
-    with session_factory() as session:
-        get_supply(session)

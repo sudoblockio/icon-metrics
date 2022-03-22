@@ -31,8 +31,10 @@ class Settings(BaseSettings):
     LOG_FORMAT: str = "string"
 
     # ICON Nodes
-    ICON_NODE_URL = "https://icon.geometry-dev.net/api/v3"
-    BACKUP_ICON_NODE_URL = "https://ctz.solidwallet.io/api/v3"
+    ICON_NODE_URL: str = "https://api.icon.geometry.io/api/v3"
+    BACKUP_ICON_NODE_URL: str = "https://ctz.solidwallet.io/api/v3"
+
+    BAND_TRANSACTIONS_ENDPOINT: str = "https://tracker.icon.community/api/v1/transactions/address/cx087b4164a87fdfb7b714f3bafe9dfb050fd6b132"
 
     # Targets
     CLUSTER_PROMETHEUS_ENDPOINT: str = "http://localhost:9090"  # For metrics to update node status
