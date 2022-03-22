@@ -1,27 +1,29 @@
-import asyncio
-from multiprocessing.pool import ThreadPool
-from threading import Thread
+from time import sleep
 
 from loguru import logger
 from prometheus_client import start_http_server
-from sqlalchemy.orm import scoped_session
 
 from icon_metrics.config import settings
+from icon_metrics.metrics import prom_metrics
 from icon_metrics.workers.db import session_factory
-from icon_metrics.workers.supply_cron import supply_cron_worker
+from icon_metrics.workers.supply_cron import get_supply
 
-logger.info("Starting metrics server.")
-metrics_pool = ThreadPool(1)
-metrics_pool.apply_async(start_http_server, (settings.METRICS_PORT, settings.METRICS_ADDRESS))
 
-Session = scoped_session(session_factory)
+def main():
+    logger.info("Starting metrics server.")
+    start_http_server(settings.METRICS_PORT, settings.METRICS_ADDRESS)
 
-supply_cron_session = Session()
+    while True:
+        with session_factory() as session:
+            logger.info("Starting cron")
 
-supply_cron_worker_thread = Thread(
-    target=supply_cron_worker,
-    args=(supply_cron_session,),
-)
+            # Supply
+            get_supply(session)
+            prom_metrics.supply_cron_ran.inc()
 
-supply_cron_worker_thread.start()
-supply_cron_worker_thread.join()
+            # Sleep
+            sleep(settings.CRON_SLEEP_SEC)
+
+
+if __name__ == "__main__":
+    main()

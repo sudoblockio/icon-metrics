@@ -1,14 +1,12 @@
-from typing import List
+# from typing import List
+# import aiohttp
 
-import aiohttp
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
 
 from icon_metrics.api.db import get_session
-from icon_metrics.config import settings
-from icon_metrics.http_client import http_client
-from icon_metrics.models.metrics import NodeState, Supply
+from icon_metrics.models.metrics import Supply
 
 router = APIRouter()
 
@@ -19,6 +17,14 @@ async def get_supply(session: AsyncSession = Depends(get_session)) -> Supply:
     result = await session.execute(select(Supply).order_by(Supply.timestamp.desc()).limit(1))
     supply = result.first()
     return supply[0]
+
+
+@router.get("/metrics/supply/circulating")
+async def get_supply(session: AsyncSession = Depends(get_session)) -> int:
+    """Get latest supply."""
+    result = await session.execute(select(Supply).order_by(Supply.timestamp.desc()).limit(1))
+    supply = result.first()
+    return int(supply[0].circulating_supply / 1e18)
 
 
 # @router.get("/metrics/node-state")
